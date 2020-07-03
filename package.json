@@ -4,6 +4,7 @@
   "description": "",
   "main": "library.js",
   "scripts": {
+    "start":"node library.js",
     "test": "mocha"
   },
   "author": "sukhiboi",
