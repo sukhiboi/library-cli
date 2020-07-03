@@ -1,9 +1,13 @@
 const vorpal = require('vorpal')();
 const chalk = require('chalk');
-const { table } = require('table');
+const { table, getBorderCharacters } = require('table');
 const SQL = require('./lib/sql');
 const client = new SQL('./library.db');
 const { insertBook, issueBook, returnBook } = require('./lib/action');
+
+const tableOptions = {
+  border: getBorderCharacters('norc'),
+};
 
 vorpal
   .command('insert book', 'Insert a book into Library')
@@ -184,12 +188,12 @@ vorpal
           return chalk.bold.green(header);
         });
         const tableRows = rows.map((row) => Object.values(row));
-        cb(table([tableHeader, ...tableRows]));
+        cb(table([tableHeader, ...tableRows], tableOptions));
       })
       .catch((err) => cb(chalk.red.bold(err)));
   });
 
-vorpal.command('logs').action((args, cb) => {
+vorpal.command('logs', 'Get transaction logs').action((args, cb) => {
   const query = 'SELECT * FROM library_log';
   client
     .connect()
@@ -199,10 +203,10 @@ vorpal.command('logs').action((args, cb) => {
         return chalk.bold.green(header);
       });
       const tableRows = rows.map((row) => Object.values(row));
-      cb(table([tableHeader, ...tableRows]));
+      cb(table([tableHeader, ...tableRows], tableOptions));
     })
-    .catch((err) => cb(chalk.red.bold(err)));
+    .catch((err) => cb(chalk.red.bold('No logs available')));
 });
 
-const delimiter = chalk.yellow.bold('Library $ ');
+const delimiter = chalk.yellow.bold('\nLibrary $ ');
 vorpal.delimiter(delimiter).show();
